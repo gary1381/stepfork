@@ -4,7 +4,7 @@ All notable changes to Stepfork are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased] - v0.2.0
+## [0.2.0] - 2026-10-12
 
 Automatic failure minimization and fork-at-step debugging with optional overrides.
 

@@ -20,8 +20,7 @@ Strategic direction for transforming Stepfork from technical foundation to widel
 ```python
 # Current: requires code changes
 @trace_tool(name="search")
-def search(query: str):
-    ...
+def search(query: str): ...
 ```
 
 **Target state**: Zero-code instrumentation
@@ -134,7 +133,7 @@ from stepfork.suggest import suggest_assertions
 assertions = suggest_assertions(
     baseline="corrected.sftrace",
     reference="failure.sftrace",
-    strictness="medium"  # loose, medium, strict
+    strictness="medium",  # loose, medium, strict
 )
 
 # Returns structured assertions ready for pytest export
@@ -159,6 +158,7 @@ from stepfork.normalize import auto_normalize
 
 with ReplaySession.from_trace("trace.sftrace", normalize=True):
     result = agent()  # UUIDs, timestamps auto-frozen
+
 
 # Custom normalizers
 @stepfork.normalizer("order_id")
