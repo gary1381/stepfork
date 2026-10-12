@@ -12,6 +12,16 @@
   Local-first behavioral regression testing for AI agents.
 </p>
 
+## Who is this for?
+
+Stepfork is for developers building AI agents who need to:
+- Turn production failures into reproducible regression tests
+- Debug multi-step agent behaviors without re-running live services
+- Prevent behavioral regressions when fixing bugs or refactoring code
+- Minimize complex failures to their essential reproduction steps
+
+If you're writing evals, Stepfork complements them: evals measure model quality across datasets, Stepfork tests that specific agent behaviors don't break.
+
 <p align="center">
   <a href="https://pypi.org/project/stepfork/"><img alt="PyPI" src="https://img.shields.io/pypi/v/stepfork?include_prereleases&label=PyPI&color=blue"></a>
   <a href="https://github.com/utsab345/stepfork/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/utsab345/stepfork/actions/workflows/ci.yml/badge.svg"></a>
@@ -41,6 +51,12 @@ misbehaves, you replay that recording and export it as an executable pytest
 regression test that asserts the corrected behavior. The test fails on the
 buggy code and passes on the fix, using the recorded responses instead of live
 services.
+
+## See It In Action
+
+This terminal recording runs the complete failure-to-test flow:
+
+![Stepfork terminal demo](scripts/terminal-demo/stepfork-demo.gif)
 
 ## How Stepfork Works
 
@@ -235,12 +251,7 @@ python -m pytest -q test_notify_fixed.py   # 1 passed
 That regression test reproduces the exact failure you started with, and now
 pins the corrected behavior.
 
-## Real Demonstration
-
-This terminal recording runs the complete failure-to-test flow using the
-minimal example agent:
-
-![Stepfork terminal demo](scripts/terminal-demo/stepfork-demo.gif)
+## Runnable Examples
 
 Six runnable demo agents ship in this repository (all fully offline, with a
 fake provider standing in for a real model):
