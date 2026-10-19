@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from stepfork.trace.models import JsonValue
+
+if TYPE_CHECKING:
+    from stepfork.trace.models import Event
 
 
 @dataclass(frozen=True)
@@ -133,6 +136,7 @@ class MinimizationResult:
     failure_signature: FailureSignature | None = None
     error_message: str | None = None
     nondeterministic: bool = False
+    minimized_events: tuple[Event, ...] | None = None
 
 
 @dataclass(frozen=True)

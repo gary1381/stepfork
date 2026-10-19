@@ -169,16 +169,18 @@ class MinimizationEngine:
                 error_message="Minimized trace does not reproduce the original failure",
             )
 
-        # Success
+        # Success - the trace is minimal when we successfully complete minimization
+        # (either we reduced it, or it was already at its smallest possible form)
         return MinimizationResult(
             success=True,
             original_event_count=len(self.trace.events),
             minimized_event_count=len(minimized_trace.events),
             replay_attempts=self.total_replay_attempts,
             preserved_failure=True,
-            is_minimal=len(minimized_trace.events) < len(self.trace.events),
+            is_minimal=True,
             failure_signature=original_signature,
             nondeterministic=self.nondeterministic_failures > 0,
+            minimized_events=tuple(minimized_trace.events),
         )
 
     def _test_subset_reproduces_failure(
@@ -269,8 +271,14 @@ def generate_report(
             "Results may vary across runs."
         )
 
-    if not result.is_minimal and result.success:
-        warnings.append("Trace was already minimal or could not be reduced further.")
+    # Check if no reduction was possible (already minimal)
+    already_minimal = (
+        result.success
+        and result.minimized_event_count is not None
+        and result.minimized_event_count == result.original_event_count
+    )
+    if already_minimal:
+        warnings.append("Trace was already minimal.")
 
     reduction_percentage: float | None = None
     if result.minimized_event_count is not None and result.original_event_count > 0:

@@ -362,3 +362,35 @@ def test_export_cli_invalid_expect_output_json(tmp_path: Path) -> None:
 
     assert result.exit_code == 2
     assert "not valid JSON" in result.stdout
+
+
+def test_export_cli_short_flag_e_for_entrypoint(tmp_path: Path) -> None:
+    """The -e short flag works for --entrypoint on export command.
+
+    Regression test for Finding 4 item 3: -e existed on minimize but not
+    on replay or export.
+    """
+    trace = tmp_path / "booking.sftrace"
+    _record_booking(trace)
+    output = tmp_path / "test_regression.py"
+
+    # Use -e instead of --entrypoint
+    result = runner.invoke(
+        app,
+        [
+            "export",
+            str(trace),
+            "--pytest",
+            "-e",  # Use short flag
+            FIXED_ENTRYPOINT,
+            "--expect-output",
+            str(EXPECTED_FILE),
+            "--output",
+            str(output),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert output.is_file()
+    # Should not complain about unknown option -e
+    assert "no such option" not in result.stdout.lower()

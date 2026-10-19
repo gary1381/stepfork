@@ -10,7 +10,6 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from stepfork.minimize.delta_debug import create_minimized_trace
 from stepfork.minimize.engine import MinimizationEngine, generate_report
 from stepfork.minimize.models import MinimizationReport
 from stepfork.minimize.signature import ReplayNeverReachedRecordedCall
@@ -175,15 +174,20 @@ def minimize_command(
 
     # Save the minimized trace
     try:
-        from stepfork.minimize.delta_debug import EventSubset
+        if result.minimized_events is None:
+            console.print("\n[red]Error: no minimized events in result[/red]")
+            raise typer.Exit(1)
 
-        minimal_subset = EventSubset(
-            events=tuple(
-                trace.events[i] for i in range(result.minimized_event_count or 0)
-            ),
-            includes_dependency_calls=True,
+        minimized_trace = Trace(
+            agent_name=trace.agent_name,
+            run_id=trace.run_id,
+            created_at=trace.created_at,
+            status=trace.status,
+            failure=trace.failure,
+            environment=trace.environment,
         )
-        minimized_trace = create_minimized_trace(trace, minimal_subset)
+        for event in result.minimized_events:
+            minimized_trace.add(event.model_copy(deep=True))
         minimized_trace.save(output, overwrite=overwrite)
     except Exception as exc:
         console.print(f"\n[red]Error saving minimized trace:[/red] {exc}")

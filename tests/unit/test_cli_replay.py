@@ -365,3 +365,25 @@ def test_replay_cli_reports_unexpected_exception_type(
     assert result.exit_code == 1
     assert "TypeError" in result.stdout
     assert "DIVERGED" in result.stdout
+
+
+def test_replay_cli_short_flag_e_for_entrypoint(tmp_path: Path) -> None:
+    """The -e short flag works for --entrypoint on replay command.
+
+    Regression test for Finding 4 item 3: -e existed on minimize but not
+    on replay or export.
+    """
+    trace = tmp_path / "booking.sftrace"
+    _record_booking(trace)
+
+    # Use -e instead of --entrypoint
+    result = runner.invoke(
+        app,
+        ["replay", str(trace), "-e", ENTRYPOINT, "--mode", "frozen"],
+        catch_exceptions=False,
+    )
+
+    assert result.exit_code == 0
+    assert "COMPLETED" in result.stdout
+    # Should not complain about unknown option -e
+    assert "no such option" not in result.stdout.lower()
