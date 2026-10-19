@@ -59,13 +59,20 @@ def detect_failure_signature(
             f"cannot resolve entrypoint {entrypoint!r}: {exc}"
         ) from exc
 
+    # Harness setup errors (invalid mode, bad allowlists) must surface as
+    # detection failures, never become a minimizable signature.
+    try:
+        session = ReplaySession.from_trace(trace, mode=mode)
+    except Exception as exc:
+        raise FailureDetectionError(f"cannot create replay session: {exc}") from exc
+
     # Attempt replay and capture the failure
     exception: BaseException | None = None
     actual_output: Any = None
     divergence_error: ReplayError | None = None
 
     try:
-        with ReplaySession.from_trace(trace, mode=mode) as replay:
+        with session as replay:
             actual_output = entrypoint_fn()
             divergence_error = replay.divergence
     except RecordedDependencyError as exc:

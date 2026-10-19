@@ -101,6 +101,8 @@ def test_missing_recorded_calls_cause_unmatched(tmp_path: Path) -> None:
         session.set_output(step("a"))
 
     # Agent makes no calls but trace expects 1
-    with pytest.raises(ReplayMismatchError, match=r"unmatched|ended before consuming"):
-        with ReplaySession.from_trace(trace_path, mode="frozen") as replay:
-            replay.verify_complete()
+    with (
+        pytest.raises(ReplayMismatchError, match=r"unmatched|ended before consuming"),
+        ReplaySession.from_trace(trace_path, mode="frozen") as replay,
+    ):
+        replay.verify_complete()
