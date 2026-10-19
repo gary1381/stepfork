@@ -18,6 +18,7 @@ from stepfork.replay import (
     ReplayError,
     ReplayExhaustedError,
     ReplayMismatchError,
+    ReplayPolicyError,
     ReplaySession,
 )
 from stepfork.trace.canonical import canonical_json_bytes
@@ -75,6 +76,13 @@ def detect_failure_signature(
         with session as replay:
             actual_output = entrypoint_fn()
             divergence_error = replay.divergence
+    except ReplayPolicyError as exc:
+        # The replay harness refused execution (forbidden/manual/derived mode,
+        # unauthorized live tool). The agent never ran its check, so this is
+        # not a failure signature to minimize. See issue #17.
+        raise FailureDetectionError(
+            f"replay policy refused the attempt: {exc}"
+        ) from exc
     except RecordedDependencyError as exc:
         exception = exc
     except ReplayMismatchError as exc:
@@ -86,6 +94,13 @@ def detect_failure_signature(
     except Exception as exc:
         # Application exception during replay
         exception = exc
+
+    # A policy refusal the agent swallowed internally still poisons the
+    # outcome; refuse instead of recording it as a divergence signature.
+    if isinstance(divergence_error, ReplayPolicyError):
+        raise FailureDetectionError(
+            f"replay policy refused the attempt: {divergence_error}"
+        ) from divergence_error
 
     # Determine the failure signature based on what happened
     if exception is not None:

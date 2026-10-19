@@ -87,6 +87,55 @@ def test_minimize_accepts_valid_modes(tmp_path: Path) -> None:
                 mode,
             ],
         )
-        # Valid modes may still fail minimization if trace doesn't fail as expected,
-        # but should not be rejected with exit 2 for invalid mode
-        assert cli_result.exit_code != 2, f"Mode {mode} was incorrectly rejected"
+        # Mode is valid, but this trace has no failure to minimize: frozen
+        # reports "no failure", the other modes refuse the policy error.
+        # Neither may exit 0 or write a bundle from a harness refusal.
+        assert cli_result.exit_code == 1, f"Mode {mode} exited {cli_result.exit_code}"
+        assert "Minimized trace saved" not in cli_result.stdout
+
+
+def test_minimize_forbidden_refuses_policy_error(tmp_path: Path) -> None:
+    """A replay policy refusal is never used as a failure signature."""
+    trace_path = tmp_path / "test.sftrace"
+    with record("cli-test-agent", output=str(trace_path)) as session:
+        output = simple_agent()
+        session.set_output(output)
+
+    expect_path = tmp_path / "expect.json"
+    expect_path.write_text('{"value": 99}')
+
+    frozen_result = runner.invoke(
+        app,
+        [
+            "minimize",
+            str(trace_path),
+            "--entrypoint",
+            "test_minimize_mode_validation:simple_agent",
+            "--expect-output",
+            str(expect_path),
+            "--output",
+            str(tmp_path / "frozen.sftrace"),
+        ],
+    )
+    assert frozen_result.exit_code == 0
+    assert "Minimized trace saved" in frozen_result.stdout
+
+    forbidden_result = runner.invoke(
+        app,
+        [
+            "minimize",
+            str(trace_path),
+            "--entrypoint",
+            "test_minimize_mode_validation:simple_agent",
+            "--expect-output",
+            str(expect_path),
+            "--mode",
+            "forbidden",
+            "--output",
+            str(tmp_path / "forbidden.sftrace"),
+        ],
+    )
+    assert forbidden_result.exit_code == 1
+    assert "Minimized trace saved" not in forbidden_result.stdout
+    flattened = " ".join(forbidden_result.stdout.split())
+    assert "replay policy refused the attempt" in flattened
