@@ -38,7 +38,7 @@ def agent_changes_arg() -> dict[str, str]:
     return step("b")  # different arg from recorded "a"
 
 
-def agent_extra_call() -> dict[str, str]:
+def agent_extra_call() -> dict[str, object]:
     step("a")
     step("extra")  # extra call not in original trace
     return {"extra": True}

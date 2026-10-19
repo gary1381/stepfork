@@ -11,16 +11,16 @@ from stepfork.replay import ReplayMismatchError, ReplaySession
 
 
 @trace_tool(name="issue_refund")
-def issue_refund(customer_id: str, amount_cents: int) -> dict:
+def issue_refund(customer_id: str, amount_cents: int) -> dict[str, object]:
     return {"customer_id": customer_id, "refunded_cents": amount_cents}
 
 
-def run_buggy() -> dict:
+def run_buggy() -> dict[str, object]:
     issue_refund("c-1", 49)  # records 49
     return {"refunded": 49}
 
 
-def run_fixed() -> dict:
+def run_fixed() -> dict[str, object]:
     issue_refund("c-1", 4999)  # changes to 4999
     return {"refunded": 4999}
 

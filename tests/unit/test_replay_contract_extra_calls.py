@@ -16,18 +16,18 @@ def get_advice(ticket: str) -> str:
 
 
 @trace_tool(name="escalate")
-def escalate(priority: str) -> dict:
+def escalate(priority: str) -> dict[str, object]:
     return {"escalated": True, "priority": priority}
 
 
-def run_crash() -> dict:
+def run_crash() -> dict[str, object]:
     # Only first call is made before crash
     get_advice("T-1")
     # escalate is never called (bug/crash)
     return {"ok": True}
 
 
-def run_fixed() -> dict:
+def run_fixed() -> dict[str, object]:
     get_advice("T-1")
     escalate("high")  # extra call beyond recorded trace
     return {"ok": True}

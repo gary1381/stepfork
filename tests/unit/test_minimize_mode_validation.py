@@ -28,10 +28,10 @@ def test_minimize_rejects_hybrid_mode(tmp_path: Path) -> None:
     """Minimize rejects unsupported 'hybrid' mode."""
     trace_path = tmp_path / "test.sftrace"
     with record("cli-test-agent", output=str(trace_path)) as session:
-        result = simple_agent()
-        session.set_output(result)
+        output = simple_agent()
+        session.set_output(output)
 
-    result = runner.invoke(
+    cli_result = runner.invoke(
         app,
         [
             "minimize",
@@ -42,18 +42,18 @@ def test_minimize_rejects_hybrid_mode(tmp_path: Path) -> None:
             "hybrid",
         ],
     )
-    assert result.exit_code == 2
-    assert "Invalid replay mode" in result.stdout
+    assert cli_result.exit_code == 2
+    assert "Invalid replay mode" in cli_result.stdout
 
 
 def test_minimize_rejects_bogus_mode(tmp_path: Path) -> None:
     """Minimize rejects invalid mode values."""
     trace_path = tmp_path / "test.sftrace"
     with record("cli-test-agent", output=str(trace_path)) as session:
-        result = simple_agent()
-        session.set_output(result)
+        output = simple_agent()
+        session.set_output(output)
 
-    result = runner.invoke(
+    cli_result = runner.invoke(
         app,
         [
             "minimize",
@@ -64,19 +64,19 @@ def test_minimize_rejects_bogus_mode(tmp_path: Path) -> None:
             "bogus",
         ],
     )
-    assert result.exit_code == 2
-    assert "Invalid replay mode" in result.stdout
+    assert cli_result.exit_code == 2
+    assert "Invalid replay mode" in cli_result.stdout
 
 
 def test_minimize_accepts_valid_modes(tmp_path: Path) -> None:
     """Valid modes are accepted by minimize."""
     trace_path = tmp_path / "test.sftrace"
     with record("cli-test-agent", output=str(trace_path)) as session:
-        result = simple_agent()
-        session.set_output(result)
+        output = simple_agent()
+        session.set_output(output)
 
     for mode in ("frozen", "live", "forbidden", "manual", "derived"):
-        result = runner.invoke(
+        cli_result = runner.invoke(
             app,
             [
                 "minimize",
@@ -89,4 +89,4 @@ def test_minimize_accepts_valid_modes(tmp_path: Path) -> None:
         )
         # Valid modes may still fail minimization if trace doesn't fail as expected,
         # but should not be rejected with exit 2 for invalid mode
-        assert result.exit_code != 2, f"Mode {mode} was incorrectly rejected"
+        assert cli_result.exit_code != 2, f"Mode {mode} was incorrectly rejected"
