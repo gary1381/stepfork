@@ -57,6 +57,7 @@ def export_command(
         str | None,
         typer.Option(
             "--entrypoint",
+            "-e",
             help="Trusted local MODULE:FUNCTION the generated test executes.",
         ),
     ] = None,
