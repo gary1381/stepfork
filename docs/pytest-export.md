@@ -33,6 +33,11 @@ code (by replay divergence) and pass on the fixed code. `stepfork score` can hel
 assess whether an expectation is claim-pinned (rejects the recorded run) or
 run-pinned (accepts it).
 
+`score` assumes the bundle is the failing run. Against a test exported from the
+*fixed* run, an expectation copied from that run reads run-pinned (exit 1) by
+construction. That verdict describes where the bundle came from, not whether the
+test is worth keeping.
+
 ---
 
 The regression test needs a separate **expected outcome**: the behavior you want

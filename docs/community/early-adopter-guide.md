@@ -37,8 +37,7 @@ pip install pytest
 stepfork --version
 ```
 
-The `--pre` flag is required while Stepfork is a pre-release. Alternatively,
-install the tagged repository build:
+Alternatively, install the tagged repository build:
 `pip install "git+https://github.com/utsab345/stepfork.git@v0.2.0"`.
 
 Requires Python 3.11, 3.12, or 3.13.

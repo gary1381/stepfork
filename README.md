@@ -117,14 +117,14 @@ change an external system; the allowlist does not sandbox it. See
 
 ## Installation
 
-Stepfork is published on PyPI. Install the current alpha with:
+Stepfork is published on PyPI. Install the current release with:
 
 ```bash
 # pip
-pip install --pre stepfork
+pip install stepfork
 
 # uv
-uv pip install --pre stepfork
+uv pip install stepfork
 ```
 
 You can also install from source or a tagged release:

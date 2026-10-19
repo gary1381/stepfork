@@ -6,14 +6,13 @@ This guide installs Stepfork and walks through the full workflow with a
 
 ## Install
 
-Install the current alpha from PyPI:
+Install the current release from PyPI:
 
 ```bash
 pip install stepfork
 ```
 
-The `--pre` flag is required while Stepfork is a pre-release. To install from
-the tagged GitHub repository instead:
+To install from the tagged GitHub repository instead:
 
 ```bash
 pip install "git+https://github.com/utsab345/stepfork.git@v0.2.0"
