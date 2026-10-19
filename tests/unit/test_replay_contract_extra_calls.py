@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from stepfork import record, trace_tool
-from stepfork.replay import ReplayMismatchError, ReplaySession
+from stepfork.replay import ReplayExhaustedError, ReplaySession
 
 
 @trace_tool(name="get_advice")
@@ -41,7 +41,7 @@ def test_extra_calls_cause_divergence(tmp_path: Path) -> None:
 
     # Fixed version makes an extra call not in recording
     with (
-        pytest.raises(ReplayMismatchError),
+        pytest.raises(ReplayExhaustedError, match="unexpected tool call"),
         ReplaySession.from_trace(trace_path, mode="frozen"),
     ):
         run_fixed()

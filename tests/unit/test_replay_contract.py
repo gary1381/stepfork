@@ -17,7 +17,11 @@ from pathlib import Path
 import pytest
 
 from stepfork import record, trace_tool
-from stepfork.replay import ReplayMismatchError, ReplaySession
+from stepfork.replay import (
+    ReplayExhaustedError,
+    ReplayMismatchError,
+    ReplaySession,
+)
 
 
 @trace_tool(name="step")
@@ -88,7 +92,7 @@ def test_extra_tool_call_cause_replay_exhausted(tmp_path: Path) -> None:
 
     # First call matches, second is extra (beyond recorded)
     with (
-        pytest.raises(ReplayMismatchError),
+        pytest.raises(ReplayExhaustedError, match="unexpected tool call"),
         ReplaySession.from_trace(trace_path, mode="frozen"),
     ):
         step("a")
