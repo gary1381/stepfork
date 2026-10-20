@@ -130,7 +130,7 @@ uv pip install stepfork
 You can also install from source or a tagged release:
 
 ```bash
-pip install "git+https://github.com/utsab345/stepfork.git@v0.2.0"
+pip install "git+https://github.com/utsab345/stepfork.git@v0.2.1"
 ```
 
 Requires Python 3.11, 3.12, or 3.13. This installs the `stepfork` CLI and the
@@ -381,7 +381,7 @@ sources live in `docs/`.
 - [Release checklist](docs/release-checklist.md)
 - [PyPI publishing checklist](docs/pypi-publishing.md)
 - [Early adopter guide](docs/community/early-adopter-guide.md)
-- [Latest release notes (v0.2.0)](docs/releases/v0.2.0.md)
+- [Release notes (v0.2.0)](docs/releases/v0.2.0.md)
 - [Changelog](CHANGELOG.md)
 
 ## Security and Limitations

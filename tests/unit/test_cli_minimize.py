@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from stepfork import record, trace_tool
+from stepfork import llm_request, record, trace_tool
 from stepfork.cli.main import app
 
 runner = CliRunner()
@@ -291,36 +291,61 @@ def _raise_value_error() -> None:
     raise ValueError("test error")
 
 
+@trace_tool(name="boom_tool")
+def boom_tool(x: int) -> int:
+    """Tool that always raises, producing a failed final dependency call."""
+    raise ValueError("boom")
+
+
+def _stub_llm(prompt: str) -> str:
+    """Record a droppable LLM request/response pair."""
+    result: str = llm_request(
+        model="stub",
+        input={"prompt": prompt},
+        call=lambda: "ok",
+    )
+    return result
+
+
+def _agent_with_droppable_groups() -> dict[str, int]:
+    """Agent with minimizable LLM groups before a failing final tool.
+
+    The two stub LLM groups are droppable; only the failing tool call, the
+    error, and the run markers must survive minimization. Dropping the first
+    group leaves the kept event indices non-contiguous, which is the exact
+    shape that triggered the run_end-dropping bug in the CLI save path.
+    """
+    _stub_llm("first")
+    _stub_llm("second")
+    boom_tool(9)
+    return {"value": 1}
+
+
 def test_minimize_failed_trace_keeps_run_end(tmp_path: Path) -> None:
     """Minimizing a failed trace preserves run_end event.
 
-    Regression test for Finding 4 item 2: run_end was being dropped from
-    minimized failed traces even though docs say run markers are kept.
+    Regression test for Finding 4 item 2: the CLI rebuilt the saved trace by
+    taking the first N events of the original trace by index, which dropped
+    run_end whenever minimization kept a non-contiguous subset.
+
+    The trace is recorded for real rather than hand-built so minimization
+    actually reaches the save path (the previous version exited early and
+    never exercised the assertions).
     """
-    from stepfork import FailureInfo, Trace
-    from stepfork.trace import (
-        ErrorEvent,
-        EventType,
-        RunEnd,
-        RunStart,
-        RunStatus,
-        ToolCall,
-        ToolResult,
-    )
+    from stepfork import Trace
+    from stepfork.trace import EventType
 
-    # Create a failing trace with multiple events
     trace_path = tmp_path / "failed.sftrace"
-    trace = Trace(agent_name="failed-agent")
-    trace.add(RunStart())
-    trace.add(ToolCall(name="some_tool", input={"x": 1}))
-    trace.add(ToolResult(name="some_tool", output={"y": 2}))
-    trace.add(ErrorEvent(error_type="ValueError", message="boom"))
-    trace.add(RunEnd(run_status=RunStatus.FAILED))
-    trace.status = RunStatus.FAILED
-    trace.failure = FailureInfo(type="ValueError", message="boom", step=3)
-    trace.save(trace_path)
+    # Let the failure escape the recording block so the trace records it.
+    try:
+        with record("failed-agent", output=str(trace_path)) as session:
+            session.set_output(_agent_with_droppable_groups())
+    except ValueError:
+        pass
 
-    # Minimize with an agent that raises the same error
+    original = Trace.load(trace_path)
+    assert original.events[-1].type is EventType.RUN_END
+
     output_path = tmp_path / "minimized.sftrace"
     result = runner.invoke(
         app,
@@ -328,25 +353,25 @@ def test_minimize_failed_trace_keeps_run_end(tmp_path: Path) -> None:
             "minimize",
             str(trace_path),
             "-e",
-            "test_cli_minimize:_raise_value_error_boom",
+            "test_cli_minimize:_agent_with_droppable_groups",
             "--output",
             str(output_path),
         ],
     )
 
-    # Check that minimization succeeded
-    if result.exit_code == 0 and output_path.exists():
-        minimized = Trace.load(output_path)
-        event_types = [e.type for e in minimized.events]
+    assert result.exit_code == 0, result.stdout
+    assert output_path.exists(), result.stdout
 
-        # run_start and run_end must be preserved per docs/minimize.md
-        assert EventType.RUN_START in event_types, "run_start should be preserved"
-        assert EventType.RUN_END in event_types, "run_end should be preserved"
+    minimized = Trace.load(output_path)
+    event_types = [e.type for e in minimized.events]
 
+    # run_start and run_end must be preserved per docs/minimize.md
+    assert EventType.RUN_START in event_types, "run_start should be preserved"
+    assert EventType.RUN_END in event_types, "run_end should be preserved"
+    assert minimized.events[-1].type is EventType.RUN_END
 
-def _raise_value_error_boom() -> None:
-    """Helper for test_minimize_failed_trace_keeps_run_end."""
-    raise ValueError("boom")
+    # The reduction must have happened, proving the save path was exercised.
+    assert len(minimized.events) < len(original.events)
 
 
 def test_minimize_short_flag_e_for_entrypoint(test_trace: Path, tmp_path: Path) -> None:

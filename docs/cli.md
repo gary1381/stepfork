@@ -1,7 +1,7 @@
 # CLI Reference
 
 The `stepfork` CLI manages `.sftrace` bundles. This page documents every
-command as of v0.2.0. Run `stepfork --help` for an up-to-date summary.
+command as of v0.2.1. Run `stepfork --help` for an up-to-date summary.
 
 ```text
 Usage: stepfork [OPTIONS] COMMAND [ARGS]...
@@ -26,7 +26,6 @@ Commands:
 - [score](#score)
 - [diff](#diff)
 - [export](#export)
-- [score](#score)
 - [run](#run)
 
 Exit code conventions:
@@ -376,6 +375,49 @@ Human output lists each changed location with its old and new value:
 Steps: 2 total (1 changed, 0 added, 0 removed, 1 unchanged)
 
 Result: BEHAVIOR CHANGED
+```
+
+---
+
+## fork
+
+Create a forked trace at a specific execution point, preserving all valid
+history before the fork.
+
+```text
+Usage: stepfork fork [OPTIONS] PATH
+```
+
+Arguments:
+
+| Argument | Description |
+|---|---|
+| `PATH` | `.sftrace` directory bundle to fork. Required. |
+
+Options:
+
+| Option | Description |
+|---|---|
+| `--at-step <N>` | Fork at this step number (0-indexed). |
+| `--at-event <ID>` | Fork at this event ID. |
+| `--output`, `-o <path>` | Output path. Default: `{stem}-forked.sftrace`. |
+| `--overwrite` | Overwrite the output if it exists. |
+| `--help` | Show command help and exit. |
+
+You must specify either `--at-step` or `--at-event`, but not both. The forked
+trace contains all events from step 0 through the fork point inclusive, with a
+new run ID and provenance recorded in `ForkInfo`. Output overrides are available
+through the Python API only. See [fork-at-step debugging](fork.md).
+
+```text
+Stepfork Fork
+
+Original trace:  failure.sftrace
+Agent:           booking-agent
+Events:          15
+Fork at step:    2
+
+Result: FORKED
 ```
 
 ---

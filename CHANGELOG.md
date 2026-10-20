@@ -4,6 +4,66 @@ All notable changes to Stepfork are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-10-20
+
+Minimization correctness fixes, tri-state regression verdicts, and expectation
+scoring on top of v0.2.0. No `.sftrace` format change.
+
+### Added
+
+- **`stepfork run`** executes an exported pytest regression test and writes a
+  machine-readable receipt. It reports a tri-state verdict (`passed`, `failed`,
+  or `could_not_execute`), so a check that never ran (for example, a missing
+  bundle) is not reported as a detected regression. Exit status is 0 for a
+  pass, 1 for a failure, and 2 for `could_not_execute`.
+- **`stepfork score`** scores an exported expectation against a mutant battery
+  derived from both the recorded run and the claim, reporting whether the
+  expectation is claim-pinned (rejects the recorded run) or run-pinned.
+- Claim-drawn mutant battery and expectation scoring internals
+  (`export/mutants.py`, `export/scoring.py`, `export/testfile.py`).
+- Receipt writer owned by the runner (`export/receipt.py`) that records the
+  bundle digest, test hash, counts, and verdict outside the tree under test.
+- Integration agent fixtures for the export-to-pytest path
+  (`tests/golden/agents/{triage_agent,crash_agent,fake_llm}.py`) plus 12
+  end-to-end tests covering changed-argument and extra-call divergence and
+  secret redaction.
+- Regression test proving minimized failed traces retain `run_end` when
+  minimization keeps a non-contiguous event subset.
+
+### Fixed
+
+- `minimize` now validates `--mode` up front and rejects invalid modes with
+  exit 2 instead of silently minimizing a failure that never existed.
+- `minimize` refuses failure signatures produced by Stepfork's own errors
+  (for example `ReplayPolicyError`) and by a replay that never reached the
+  recorded call, rather than treating them as the failure under test.
+- `minimize` no longer drops `run_end` from a minimized failed trace; the CLI
+  saves the events the engine actually kept instead of slicing the original
+  trace by index.
+- `minimize` no longer prints `Minimal: No` beside an "already minimal"
+  warning; a successfully minimized trace reports `Minimal: Yes`.
+- `replay` and `export` accept the `-e` short flag for `--entrypoint`, matching
+  `minimize`.
+
+### Changed
+
+- Export scoring no longer reports a fix-side test as a claim-pinned oracle by
+  construction; the verdict describes where the bundle came from.
+- Replay extra-call tests are pinned to `ReplayExhaustedError`.
+
+### Documentation
+
+- State the frozen-replay export boundary in `docs/pytest-export.md` and add
+  divergence troubleshooting.
+- Drop leftover `pip install --pre stepfork` instructions and note the
+  fix-side score verdict.
+- Document `stepfork run` and its exit codes.
+
+### Limitations
+
+- The minimization, fork, and verdict limitations listed under v0.2.0 still
+  apply.
+
 ## [0.2.0] - 2026-10-12
 
 Automatic failure minimization and fork-at-step debugging with optional overrides.

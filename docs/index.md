@@ -55,7 +55,7 @@ all run locally.
 
 ## Get started
 
-Stepfork is on PyPI: `pip install --pre stepfork`. Then run a 60-second example
+Stepfork is on PyPI: `pip install stepfork`. Then run a 60-second example
 and learn the core workflow in the [Getting started](getting-started.md) guide.
 The [examples](examples.md) page walks through the five runnable demo agents
 in this repository.

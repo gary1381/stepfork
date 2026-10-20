@@ -15,7 +15,7 @@ pip install stepfork
 To install from the tagged GitHub repository instead:
 
 ```bash
-pip install "git+https://github.com/utsab345/stepfork.git@v0.2.0"
+pip install "git+https://github.com/utsab345/stepfork.git@v0.2.1"
 ```
 
 Requires Python 3.11, 3.12, or 3.13. This installs the `stepfork` CLI and the

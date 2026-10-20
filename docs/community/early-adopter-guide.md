@@ -38,7 +38,7 @@ stepfork --version
 ```
 
 Alternatively, install the tagged repository build:
-`pip install "git+https://github.com/utsab345/stepfork.git@v0.2.0"`.
+`pip install "git+https://github.com/utsab345/stepfork.git@v0.2.1"`.
 
 Requires Python 3.11, 3.12, or 3.13.
 

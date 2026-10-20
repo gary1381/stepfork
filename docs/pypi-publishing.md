@@ -5,8 +5,8 @@ This checklist covers publishing Stepfork to PyPI using **trusted publishing**
 after a release is explicitly approved. Nothing in this document uploads a
 package on its own.
 
-Current status: **published.** `pip install --pre stepfork` resolves to the
-latest available alpha on PyPI. Each subsequent release uses a new version;
+Current status: **published.** `pip install stepfork` resolves to the latest
+available release on PyPI. Each subsequent release uses a new version;
 published versions are not overwritten. Follow the procedure below.
 
 ## 0. Preconditions
@@ -56,8 +56,9 @@ variant that adds `repository-url: https://test.pypi.org/legacy/` to the
 publish step and register a TestPyPI trusted publisher.
 
 - [ ] Configure a trusted publisher for TestPyPI (see below).
-- [ ] Publish to TestPyPI and verify a clean install:
-      `pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --pre stepfork`
+- [ ] Publish to TestPyPI and verify a clean install (add `--pre` only when the
+      version under test is itself a PEP 440 pre-release):
+      `pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ stepfork`
 - [ ] Run `stepfork --version` and the five-minute quickstart from the
       installed package.
 
@@ -100,8 +101,8 @@ reviewers to that environment if you want a human to approve each publish.
       release triggers the trusted publish workflow; there is no manual trigger.
 - [ ] Confirm the wheel and sdist appear on the PyPI project page.
 - [ ] In a brand-new venv:
-      `pip install --pre stepfork` (pre-release requires `--pre` until a final
-      release exists), then run `stepfork --version` and the quickstart.
+      `pip install stepfork` (add `--pre` if the version under test is itself a
+      PEP 440 pre-release), then run `stepfork --version` and the quickstart.
 
 ## 7. If something is wrong
 

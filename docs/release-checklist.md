@@ -19,7 +19,7 @@ hatchling via `[tool.hatch.version]`.
       `pytest` and the optional extras under test, then run all demos and
       check the CLI:
       ```bash
-      pip install --pre "stepfork[openai,langgraph]"
+      pip install "stepfork[openai,langgraph]"
       python examples/quickstart/demo.py
       python examples/booking_agent/demo.py
       python examples/refund_agent/demo.py

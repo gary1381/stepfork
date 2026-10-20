@@ -27,6 +27,8 @@ nav:
       - hybrid.md
       - diff.md
       - pytest-export.md
+      - minimize.md
+      - fork.md
       - openai.md
       - langgraph.md
       - trace-format.md
@@ -41,6 +43,7 @@ nav:
       - development.md
       - release-checklist.md
       - pypi-publishing.md
+      - releases/v0.2.0.md
       - releases/v0.1.0a6.md
       - releases/v0.1.0a5.md
       - releases/v0.1.0a4.md
