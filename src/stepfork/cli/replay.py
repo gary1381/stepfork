@@ -45,6 +45,7 @@ def replay_command(
         str,
         typer.Option(
             "--entrypoint",
+            "-e",
             help="Trusted local MODULE:FUNCTION to execute under replay.",
         ),
     ],
