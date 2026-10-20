@@ -449,14 +449,32 @@ bundles, are in [docs/security.md](docs/security.md).
 - Reusable GitHub Action
 - Local viewer
 
-## Contributing
+## Contributing to StepFork
 
-Contributions are welcome. Start with
+External contributions are welcome. Start with
 [CONTRIBUTING.md](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md).
 Local development instructions live in [docs/development.md](docs/development.md).
 If you find a security issue, report it privately per
 [SECURITY.md](SECURITY.md). Please do not include secrets, credentials, or
 sensitive trace data in issues, tests, examples, or commits.
+
+Browse the [open issues](https://github.com/utsab345/stepfork/issues) or pick one
+of the tasks below. Please comment on an issue before starting work so we can
+coordinate and avoid duplicate effort.
+
+### Good first issues
+
+- [Add a runnable LangGraph integration tutorial](https://github.com/utsab345/stepfork/issues/26)
+- [Expand CLI error handling regression coverage](https://github.com/utsab345/stepfork/issues/27)
+
+### Other contribution opportunities
+
+- [Add cross-platform smoke tests for Windows and macOS](https://github.com/utsab345/stepfork/issues/28)
+- [Expand trace redaction regression coverage](https://github.com/utsab345/stepfork/issues/29)
+- [Report instrumentation coverage for agent runs](https://github.com/utsab345/stepfork/issues/30)
+
+Have a different idea? Please open an issue to discuss it before implementing a
+substantial change.
 
 ## License
 
